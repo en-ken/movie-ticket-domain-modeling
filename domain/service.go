@@ -1,13 +1,13 @@
 package domain
 
-type QualificationPriceMap map[Qualification]int
+type QualificationPriceMap map[TicketType]int
 
 var PriceMap = map[TimeCategory]QualificationPriceMap{
-	TimeCategoryWeekDayGeneral: {QualificationCinemaCitizen: 1000, QualificationCinemaCitizenOver60: 1000, QualificationGeneral: 1800, QualificationSenior: 1100, QualificationStudent: 1500, QualificationSecondarySchoolStudent: 1000, QualificationPrimaryStudentOrBelow: 1000, QualificationHandicapped: 1000, QualificationHandicappedStudent: 900, QualificationCouple50: 1100},
-	TimeCategoryWeekDayLate:    {QualificationCinemaCitizen: 1000, QualificationCinemaCitizenOver60: 1000, QualificationGeneral: 1300, QualificationSenior: 1100, QualificationStudent: 1300, QualificationSecondarySchoolStudent: 1000, QualificationPrimaryStudentOrBelow: 1000, QualificationHandicapped: 1000, QualificationHandicappedStudent: 900, QualificationCouple50: 1100},
-	TimeCategoryWeekendGeneral: {QualificationCinemaCitizen: 1300, QualificationCinemaCitizenOver60: 1000, QualificationGeneral: 1800, QualificationSenior: 1100, QualificationStudent: 1500, QualificationSecondarySchoolStudent: 1000, QualificationPrimaryStudentOrBelow: 1000, QualificationHandicapped: 1000, QualificationHandicappedStudent: 900, QualificationCouple50: 1100},
-	TimeCategoryWeekendLate:    {QualificationCinemaCitizen: 1000, QualificationCinemaCitizenOver60: 1000, QualificationGeneral: 1300, QualificationSenior: 1100, QualificationStudent: 1300, QualificationSecondarySchoolStudent: 1000, QualificationPrimaryStudentOrBelow: 1000, QualificationHandicapped: 1000, QualificationHandicappedStudent: 900, QualificationCouple50: 1100},
-	TimeCategoryMovieDay:       {QualificationCinemaCitizen: 1100, QualificationCinemaCitizenOver60: 1000, QualificationGeneral: 1100, QualificationSenior: 1100, QualificationStudent: 1100, QualificationSecondarySchoolStudent: 1000, QualificationPrimaryStudentOrBelow: 1000, QualificationHandicapped: 1000, QualificationHandicappedStudent: 900, QualificationCouple50: 1100},
+	TimeCategoryWeekDayGeneral: {TicketTypeCinemaCitizen: 1000, TicketTypeCinemaCitizenOver60: 1000, TicketTypeGeneral: 1800, TicketTypeSenior: 1100, TicketTypeStudent: 1500, TicketTypeSecondarySchoolStudent: 1000, TicketTypePrimaryStudentOrBelow: 1000, TicketTypeHandicapped: 1000, TicketTypeHandicappedStudent: 900, TicketTypeCouple50: 1100},
+	TimeCategoryWeekDayLate:    {TicketTypeCinemaCitizen: 1000, TicketTypeCinemaCitizenOver60: 1000, TicketTypeGeneral: 1300, TicketTypeSenior: 1100, TicketTypeStudent: 1300, TicketTypeSecondarySchoolStudent: 1000, TicketTypePrimaryStudentOrBelow: 1000, TicketTypeHandicapped: 1000, TicketTypeHandicappedStudent: 900, TicketTypeCouple50: 1100},
+	TimeCategoryWeekendGeneral: {TicketTypeCinemaCitizen: 1300, TicketTypeCinemaCitizenOver60: 1000, TicketTypeGeneral: 1800, TicketTypeSenior: 1100, TicketTypeStudent: 1500, TicketTypeSecondarySchoolStudent: 1000, TicketTypePrimaryStudentOrBelow: 1000, TicketTypeHandicapped: 1000, TicketTypeHandicappedStudent: 900, TicketTypeCouple50: 1100},
+	TimeCategoryWeekendLate:    {TicketTypeCinemaCitizen: 1000, TicketTypeCinemaCitizenOver60: 1000, TicketTypeGeneral: 1300, TicketTypeSenior: 1100, TicketTypeStudent: 1300, TicketTypeSecondarySchoolStudent: 1000, TicketTypePrimaryStudentOrBelow: 1000, TicketTypeHandicapped: 1000, TicketTypeHandicappedStudent: 900, TicketTypeCouple50: 1100},
+	TimeCategoryMovieDay:       {TicketTypeCinemaCitizen: 1100, TicketTypeCinemaCitizenOver60: 1000, TicketTypeGeneral: 1100, TicketTypeSenior: 1100, TicketTypeStudent: 1100, TicketTypeSecondarySchoolStudent: 1000, TicketTypePrimaryStudentOrBelow: 1000, TicketTypeHandicapped: 1000, TicketTypeHandicappedStudent: 900, TicketTypeCouple50: 1100},
 }
 
 type Ticket struct {
@@ -28,15 +28,15 @@ func CalculateTicketPrice(movie *Movie, audiences ...*Audience) *PurchaseInfo {
 	tickets := make([]*Ticket, len(audiences))
 	for i, aud := range audiences {
 		ticket := &Ticket{
-			TicketTypeName: QualificationNameMap[QualificationGeneral],
-			Price:          prices[QualificationGeneral],
+			TicketTypeName: TicketTypeNameMap[TicketTypeGeneral],
+			Price:          prices[TicketTypeGeneral],
 		}
-		for _, q := range aud.Qualifications {
+		for _, q := range aud.AvailableTicketTypes {
 			p := prices[q]
-			//最低料金を適用する
+			//購入可能チケットから最低料金を適用する
 			if ticket.Price >= p {
 				ticket = &Ticket{
-					TicketTypeName: QualificationNameMap[q],
+					TicketTypeName: TicketTypeNameMap[q],
 					Price:          p,
 				}
 			}

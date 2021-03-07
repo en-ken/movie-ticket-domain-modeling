@@ -2,51 +2,51 @@ package domain
 
 import "errors"
 
-type Qualification int
+type TicketType int
 
 const (
 	// 一般
-	QualificationGeneral Qualification = iota + 1
+	TicketTypeGeneral TicketType = iota + 1
 	// 中高生
-	QualificationSecondarySchoolStudent
+	TicketTypeSecondarySchoolStudent
 	// 学生(大・専門)
-	QualificationStudent
+	TicketTypeStudent
 	// 障害者
-	QualificationHandicapped
+	TicketTypeHandicapped
 	// 障害者(高校生以下)
-	QualificationHandicappedStudent
+	TicketTypeHandicappedStudent
 	// シネマシチズン
-	QualificationCinemaCitizen
+	TicketTypeCinemaCitizen
 	// シネマシチズン(60歳以上)
-	QualificationCinemaCitizenOver60
+	TicketTypeCinemaCitizenOver60
 	// 50夫婦割対象
-	QualificationCouple50
+	TicketTypeCouple50
 
 	//以下、年齢で自動判定できるもの
 	//シニア
-	QualificationSenior
+	TicketTypeSenior
 	//小学生以下
-	QualificationPrimaryStudentOrBelow
+	TicketTypePrimaryStudentOrBelow
 )
 
-var QualificationNameMap = map[Qualification]string{
-	QualificationGeneral:                "一般",
-	QualificationSenior:                 "シニア(70歳以上)",
-	QualificationStudent:                "学生(大・専)",
-	QualificationSecondarySchoolStudent: "中・高校生",
-	QualificationPrimaryStudentOrBelow:  "幼児(3歳以上）・小学生",
-	QualificationHandicapped:            "障がい者(学生以上)",
-	QualificationHandicappedStudent:     "障がい者(高校生以下)",
-	QualificationCinemaCitizen:          "シネマシチズン",
-	QualificationCinemaCitizenOver60:    "シネマシチズン(60歳以上)",
-	QualificationCouple50:               "夫婦50割",
+var TicketTypeNameMap = map[TicketType]string{
+	TicketTypeGeneral:                "一般",
+	TicketTypeSenior:                 "シニア(70歳以上)",
+	TicketTypeStudent:                "学生(大・専)",
+	TicketTypeSecondarySchoolStudent: "中・高校生",
+	TicketTypePrimaryStudentOrBelow:  "幼児(3歳以上）・小学生",
+	TicketTypeHandicapped:            "障がい者(学生以上)",
+	TicketTypeHandicappedStudent:     "障がい者(高校生以下)",
+	TicketTypeCinemaCitizen:          "シネマシチズン",
+	TicketTypeCinemaCitizenOver60:    "シネマシチズン(60歳以上)",
+	TicketTypeCouple50:               "夫婦50割",
 }
 
 type Audience struct {
 	// 年齢
 	Age int
-	// 資格(高校生かつ障害者がありうるのでスライス)
-	Qualifications []Qualification
+	// 購入可能なチケット種別
+	AvailableTicketTypes []TicketType
 }
 
 func isSenior(age int) bool {
@@ -63,48 +63,49 @@ func NewAudience(age int, isSecondarySchoolStudent, isStudent, isHandicapped, is
 		return nil, errors.New("中高生と大学生の資格は同時に満たせません")
 	}
 
-	q := make([]Qualification, 0)
+	t := make([]TicketType, 0)
 	//シニア
 	if isSenior(age) {
-		q = append(q, QualificationSenior)
+		t = append(t, TicketTypeSenior)
 	}
 	//小学生以下
 	if isPrimaryStudentOrBelow(age) {
-		q = append(q, QualificationPrimaryStudentOrBelow)
+		t = append(t, TicketTypePrimaryStudentOrBelow)
 	}
 	//中高生
 	if isSecondarySchoolStudent {
-		q = append(q, QualificationSecondarySchoolStudent)
+		t = append(t, TicketTypeSecondarySchoolStudent)
 	}
 	//大学生
 	if isStudent {
-		q = append(q, QualificationStudent)
+		t = append(t, TicketTypeStudent)
 	}
 
 	//障害者
 	if isHandicapped {
 		// 高校生以下
 		if isPrimaryStudentOrBelow(age) || isSecondarySchoolStudent {
-			q = append(q, QualificationHandicappedStudent)
+			t = append(t, TicketTypeHandicappedStudent)
 		} else {
-			q = append(q, QualificationHandicapped)
+			t = append(t, TicketTypeHandicapped)
 		}
 	}
 	//シネマシチズン
 	if isCinemaCitizen {
 		//60歳以上
 		if age >= 60 {
-			q = append(q, QualificationCinemaCitizenOver60)
+			t = append(t, TicketTypeCinemaCitizenOver60)
 		} else {
-			q = append(q, QualificationCinemaCitizen)
+			t = append(t, TicketTypeCinemaCitizen)
 		}
 	}
+	//夫婦50割
 	if isCouple50 {
-		q = append(q, QualificationCouple50)
+		t = append(t, TicketTypeCouple50)
 	}
 
 	return &Audience{
-		Age:            age,
-		Qualifications: q,
+		Age:                  age,
+		AvailableTicketTypes: t,
 	}, nil
 }
